@@ -2,12 +2,16 @@ import React, { useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom';
 import queryString from 'query-string';
 import io from 'socket.io-client'; 
+import './Chat.css';
+import InfoBar from '../InfoBar/InfoBar';
 
 let socket;
 
 function Chat() {
     const [name, setName] = useState('');
     const [room, setRoom] = useState('');
+    const [messages, setMessages] = useState([]);
+    const [message, setMessage] = useState('');   
     const location = useLocation();
     const ENDPOINT = 'localhost:5000';
     
@@ -20,6 +24,8 @@ function Chat() {
         setRoom(room);
         
         socket.emit('join', { name, room }, () => {
+            //this third parameter receives callback response from server and is 
+            //usaully used for error handling 
         });
 
         return () => {
@@ -28,11 +34,33 @@ function Chat() {
             socket.off();
         }
 
-    },[ENDPOINT, location.search])
+    },[ENDPOINT, location.search]);
+
+
+    useEffect(() => {
+        socket.on('message', (message) => {
+            setMessages([...messages, message]);
+        });
+    },[messages]);
+
+    const sendMessage = (event) => {
+        event.preventDefault();
+
+        if(message) socket.emit('sendMessage', message, () => setMessage(''));
+
+    }
+
+    console.log(message,  messages);
 
     return (
-        <div>
-           <h1>Chat</h1> 
+        <div className="outerContainer">
+            <div className="container">
+                <InfoBar />
+                {/* <input 
+                    value={message} 
+                    onChange={(event) => setMessage(event.target.value)} 
+                    onKeyPress={(event) => event.key === 'Enter' ? sendMessage(event) : null } /> */}
+            </div>
         </div>
     )
 }
