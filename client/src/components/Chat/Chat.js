@@ -4,6 +4,8 @@ import queryString from 'query-string';
 import io from 'socket.io-client'; 
 import './Chat.css';
 import InfoBar from '../InfoBar/InfoBar';
+import Input from '../Input/Input';
+import Messages from '../Messages/Messages';
 
 let socket;
 
@@ -47,7 +49,6 @@ function Chat() {
         event.preventDefault();
 
         if(message) socket.emit('sendMessage', message, () => setMessage(''));
-
     }
 
     console.log(message,  messages);
@@ -55,11 +56,9 @@ function Chat() {
     return (
         <div className="outerContainer">
             <div className="container">
-                <InfoBar />
-                {/* <input 
-                    value={message} 
-                    onChange={(event) => setMessage(event.target.value)} 
-                    onKeyPress={(event) => event.key === 'Enter' ? sendMessage(event) : null } /> */}
+                <InfoBar room={room} />
+                <Messages messages={messages} name={name} />
+                <Input message={message} setMessage={setMessage} sendMessage={sendMessage} />
             </div>
         </div>
     )
